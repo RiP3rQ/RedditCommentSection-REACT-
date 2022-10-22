@@ -50,12 +50,19 @@ export function PostProvider({ children }) {
         })
       }
 
+      function deleteLocalComment(id) {
+        setComments(prevComments => {
+          return prevComments.filter(comment => comment.id !== id)
+        })
+      }
+
     return ( <Context.Provider value={{
         post: { id, ...post },
         getReplies,
         rootComments: commentsByParentId[null],
         createLocalComment,
         updateLocalComment,
+        deleteLocalComment,
     }}>
         {loading ? (
         <h1>Loading</h1>

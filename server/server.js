@@ -122,6 +122,26 @@ app.post("/posts/:id/comments", async (req, res) => {
     )
   })
 
+  app.delete("/posts/:postId/comments/:commentId", async (req, res) => {
+    const { userId } = await prisma.comment.findUnique({
+      where: { id: req.params.commentId },
+      select: { userId: true },
+    })
+    if (userId !== req.cookies.userId) {
+      return res.send(
+        app.httpErrors.unauthorized(
+          "You do not have permission to delete this message"
+        )
+      )
+    }
+  
+    return await commitToDb(
+      prisma.comment.delete({
+        where: { id: req.params.commentId },
+        select: { id: true },
+      })
+    )
+  })
 
 async function commitToDb(promise) {
     const [error, data] = await app.to(promise)
