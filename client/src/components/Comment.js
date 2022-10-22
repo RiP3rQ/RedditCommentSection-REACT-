@@ -4,6 +4,7 @@ import { FaEdit, FaHeart, FaRegHeart, FaReply, FaTrash } from "react-icons/fa"
 import { usePost } from '../contexts/PostContext'
 import CommentList from './CommentList'
 import { useAsyncFn } from '../hooks/useAsync'
+import { useUser } from '../hooks/useUser'
 import { createComment, updateComment, deleteComment } from "../services/comments"
 import  CommentForm  from "./CommentForm"
 
@@ -19,6 +20,7 @@ export default function Comment({ id, message, user, createdAt }) {
     const createCommentFn = useAsyncFn(createComment)
     const updateCommentFn = useAsyncFn(updateComment)
     const deleteCommentFn = useAsyncFn(deleteComment)
+    const currentUser = useUser()
   
     function onCommentReply(message) {
         return createCommentFn
@@ -73,19 +75,23 @@ export default function Comment({ id, message, user, createdAt }) {
                 Icon={FaReply}
                 aria-label={isReplying ? "Cancel Reply" : "Reply"} />
 
-                <IconBtn 
-                onClick={() => setIsEditing(prev => !prev)}
-                isActive={isEditing}
-                Icon={FaEdit}
-                aria-label={isEditing ? "Cancel Edit" : "Edit"} />
+                {user.id === currentUser.id && (
+                    <>
+                        <IconBtn 
+                        onClick={() => setIsEditing(prev => !prev)}
+                        isActive={isEditing}
+                        Icon={FaEdit}
+                        aria-label={isEditing ? "Cancel Edit" : "Edit"} />
 
-                <IconBtn
-                disabled={deleteCommentFn.loading}
-                onClick={onCommentDelete}
-                Icon={FaTrash}
-                aria-label="Delete"
-                color="danger"
-                />   
+                        <IconBtn
+                        disabled={deleteCommentFn.loading}
+                        onClick={onCommentDelete}
+                        Icon={FaTrash}
+                        aria-label="Delete"
+                        color="danger"
+                        />  
+                    </>
+                )}
 
                 {deleteCommentFn.error && (
                     <div className="error-msg mt-1">{deleteCommentFn.error}</div>
