@@ -11,6 +11,7 @@ export default function Comment({ id, message, user, createdAt }) {
     const { getReplies } = usePost()
     const childComments = getReplies(id)
     const [ areChildrenHidden , setAreChildrenHidden] = useState(false)
+    const [isReplying, setIsReplying] = useState(false)
   
     return (
     <>

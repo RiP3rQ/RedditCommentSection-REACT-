@@ -13,7 +13,6 @@ export default function CommentForm({
     function handleSubmit(e){
         e.preventDefault()
         onSubmit(message).then( () => setMessage(""))
-        console.log("essa");
     }
 
     return (
