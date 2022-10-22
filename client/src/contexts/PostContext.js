@@ -38,11 +38,24 @@ export function PostProvider({ children }) {
         })
       }
 
+      function updateLocalComment(id, message) {
+        setComments(prevComments => {
+          return prevComments.map(comment => {
+            if (comment.id === id) {
+              return { ...comment, message }
+            } else {
+              return comment
+            }
+          })
+        })
+      }
+
     return ( <Context.Provider value={{
         post: { id, ...post },
         getReplies,
         rootComments: commentsByParentId[null],
         createLocalComment,
+        updateLocalComment,
     }}>
         {loading ? (
         <h1>Loading</h1>
