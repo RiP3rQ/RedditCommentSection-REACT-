@@ -13,9 +13,25 @@ export function PostProvider({ children }) {
 
     const { id } = useParams()
     const { loading, error, value: post } = useAsync( () => getPost(id), [id])
+    const commentsByParentId = useMemo(() => {
+        if (post?.comments == null) return []
+        const group = {}
+        post.comments.forEach(comment => {
+          group[comment.parentId] ||= []
+          group[comment.parentId].push(comment)
+        })
+        return group
+      }, [post?.comments])
+
+      function getReplies(parentId){
+        return commentsByParentId[parentId]
+      }
+
 
     return ( <Context.Provider value={{
         post: { id, ...post },
+        getReplies,
+        rootComments: commentsByParentId[null],
     }}>
         {loading ? (
         <h1>Loading</h1>
