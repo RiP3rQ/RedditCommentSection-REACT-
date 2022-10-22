@@ -28,7 +28,7 @@ export default function CommentForm({
                 {loading ? "Loading" : "Post"}
             </button>
         </div>
-        <div className="error-msg">Error</div>
+        <div className="error-msg">{error}</div>
     </form>
   )
 }
