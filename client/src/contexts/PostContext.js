@@ -56,6 +56,30 @@ export function PostProvider({ children }) {
         })
       }
 
+      function toggleLocalCommentLike(id, addLike) {
+        setComments(prevComments => {
+          return prevComments.map(comment => {
+            if (id === comment.id) {
+              if (addLike) {
+                return {
+                  ...comment,
+                  likeCount: comment.likeCount + 1,
+                  likedByMe: true,
+                }
+              } else {
+                return {
+                  ...comment,
+                  likeCount: comment.likeCount - 1,
+                  likedByMe: false,
+                }
+              }
+            } else {
+              return comment
+            }
+          })
+        })
+      }
+
     return ( <Context.Provider value={{
         post: { id, ...post },
         getReplies,
@@ -63,6 +87,7 @@ export function PostProvider({ children }) {
         createLocalComment,
         updateLocalComment,
         deleteLocalComment,
+        toggleLocalCommentLike,
     }}>
         {loading ? (
         <h1>Loading</h1>

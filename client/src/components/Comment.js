@@ -5,14 +5,14 @@ import { usePost } from '../contexts/PostContext'
 import CommentList from './CommentList'
 import { useAsyncFn } from '../hooks/useAsync'
 import { useUser } from '../hooks/useUser'
-import { createComment, updateComment, deleteComment } from "../services/comments"
+import { createComment, updateComment, deleteComment, toggleCommentLike } from "../services/comments"
 import  CommentForm  from "./CommentForm"
 
 const dateFormatter = new Intl.DateTimeFormat(undefined, {dateStyle: 'medium', timeStyle: 'short'})
 
-export default function Comment({ id, message, user, createdAt }) {
+export default function Comment({ id, message, user, createdAt, likeCount, likedByMe }) {
     
-    const { post, getReplies, createLocalComment, updateLocalComment, deleteLocalComment } = usePost()
+    const { post, getReplies, createLocalComment, updateLocalComment, deleteLocalComment, toggleLocalCommentLike } = usePost()
     const childComments = getReplies(id)
     const [ areChildrenHidden , setAreChildrenHidden] = useState(false)
     const [ isReplying, setIsReplying ] = useState(false)
@@ -20,6 +20,7 @@ export default function Comment({ id, message, user, createdAt }) {
     const createCommentFn = useAsyncFn(createComment)
     const updateCommentFn = useAsyncFn(updateComment)
     const deleteCommentFn = useAsyncFn(deleteComment)
+    const toggleCommentLikeFn = useAsyncFn(toggleCommentLike)
     const currentUser = useUser()
   
     function onCommentReply(message) {
@@ -46,6 +47,12 @@ export default function Comment({ id, message, user, createdAt }) {
           .then(comment => deleteLocalComment(comment.id))
       }
 
+    function onToggleCommentLike() {
+        return toggleCommentLikeFn
+          .execute({ id, postId: post.id })
+          .then(({ addLike }) => toggleLocalCommentLike(id, addLike))
+    }
+
     return (
     <>
         <div className="comment">
@@ -65,8 +72,13 @@ export default function Comment({ id, message, user, createdAt }) {
                 <div className="message">{message}</div>
             )}
             <div className="footer">
-                <IconBtn Icon={FaHeart} aria-label="Like">
-                    2
+                <IconBtn
+                onClick={onToggleCommentLike}
+                disabled={toggleCommentLikeFn.loading}
+                Icon={likedByMe ? FaHeart : FaRegHeart}
+                aria-label={likedByMe ? "Unlike" : "Like"}
+                >
+                    {likeCount}
                 </IconBtn>
 
                 <IconBtn 
