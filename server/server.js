@@ -13,7 +13,18 @@ app.register(cors, {
     origin: process.env.CLIENT_URL,
     credentials: true,
 })
+app.addHook("onRequest", (req, res, done) => {
+    if (req.cookies.userId !== CURRENT_USER_ID) {
+      req.cookies.userId = CURRENT_USER_ID
+      res.clearCookie("userId")
+      res.setCookie("userId", CURRENT_USER_ID)
+    }
+    done()
+  })
 const prisma = new PrismaClient()
+const CURRENT_USER_ID = (
+    await prisma.user.findFirst({ where: { name: "Kyle" } })
+  ).id
 
 app.get("/posts", async (req, res) => {
     return await commitToDb(
@@ -69,7 +80,7 @@ app.post("/posts/:id/comments", async (req, res) => {
         .create({
           data: {
             message: req.body.message,
-            userId: null,
+            userId: req.cookies.userId,
             parentId: req.body.parentId,
             postId: req.params.id,
           },
